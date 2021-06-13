@@ -1,9 +1,6 @@
-
 import json
 import os
-
-import win32api
-
+import main
 theme = {
     'black_theme': {
         'app-bg': '#404040',
@@ -127,57 +124,95 @@ error_codes  = {
         'tweak-power':1014,
     }
 }
+
+
 # Array of bad words
+def handle_d_error(callback_func):
+    def decorator_function(*args, **kwargs):
+        result = ''
+        try:
+            result = callback_func(*args)
+        except FileNotFoundError as e:
+            print("File not found error")
+            main.error_message(f"Error occurred inside e[{callback_func.__name__}]",
+                          'Error Details: \n' + 'File Not Found'+str(e).capitalize(), 3)
+        except OSError as e:
+            main.error_message(f"Error occurred inside e[{callback_func.__name__}]",
+                               'Error Details: \n' + 'OS Error occurred' + str(e).capitalize(), 3)
+        except Exception as e:
+            print(f"Error occurred inside [" + callback_func.__name__ + "]")
+            main.error_message(f"Error occurred inside e[{callback_func.__name__}]",'Error Details: \n'+str(e).capitalize(), 3)
+        return result
+    return decorator_function
 
 
 # This function takes in a json file and array and converts that array into json file inside data directory
 # EX: write_jsonfile('commands.json',commands)
-def write_jsonfile(filename,filedata):
-    with open('data/'+filename, 'w') as fp:
+@handle_d_error
+def write_jsonfile(filename,filedata,dir='data'):
+    filepath = os.path.join(dir,filename)
+    if not os.path.exists(dir):
+        os.mkdir(dir)
+    with open(filepath, 'w') as fp:
         json.dump(filedata, fp, indent=1)
+
 
 # Reading json file, This returns an array contained in json file
 # EX: read_jsonfile('commands.json')
-def read_jsonfile(filename):
-    with open('data/'+filename,'r') as fp:
+@handle_d_error
+def read_jsonfile(filename,dir='data'):
+    filepath = os.path.join(dir,filename)
+    with open(filepath,'r') as fp:
         res = json.load(fp)
     return res
 
+
 # Takes filenames and filedatas in list format and rewrites it note that length of both parameters should be equal
+@handle_d_error
 def update_json_files(filenames, filedatas):
     if type(filenames) is list and type(filedatas) is list and len(filenames) == len(filedatas):
-        for i_index,i_item in enumerate(filenames):
-            for j_index,j_item in enumerate(filedatas):
-                if i_index == j_index:
-                    write_jsonfile(i_item,j_item)
+        list(map(lambda i_item,j_item: write_jsonfile(i_item,j_item), filenames,filedatas))
     else:
-        print("Error occurred")
+        print("Error occurred,make sure that you have passed list only and length of list is same")
+
 
 # This adds indentation
+@handle_d_error
 def jp(json_data,indent=1):
     return json.dumps(json_data, indent=indent, ensure_ascii=False)
 
+
 # Given an array/list of filenames it returns parsed json and prettified(indented) json
+@handle_d_error
 def retrieve_json_files(filenames):
     prettified_json = []
     parsed_json = []
     for fn in filenames:
         res = read_jsonfile(fn)
-        parsed_json.append(json.loads(jp(res,None)))
+        parsed_json.append(json.loads(jp(res,1)))
         prettified_json.append(jp(res,1))
     return [parsed_json,prettified_json]
 
+
 # Prints json
+@handle_d_error
 def print_json(json_list,func=print):
+    with open('file','r') as e:
+        print(e.read())
     for json in json_list:
         func(json)
 
 
 if __name__ == '__main__':
-    write_jsonfile('commands.json',commands)
+    # write_jsonfile('commands.json',commands)
+    # update_json_files(['filenames1','filenames2'], ['filedatas1','filenamesdata2'])
     # update_json_files('bw.json',b_w)
     # print_json(read_jsonfile('bw.json'))
     print_json(retrieve_json_files(['commands.json'])[1])
     pass
 
-# pipwin
+# Update json files
+# for i_index,i_item in enumerate(filenames):
+#     for j_index,j_item in enumerate(filedatas):
+#         if i_index == j_index:
+#             write_jsonfile(i_item,j_item)
