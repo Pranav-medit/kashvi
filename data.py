@@ -155,7 +155,7 @@ def write_jsonfile(filename,filedata,dir='data'):
         os.mkdir(dir)
     with open(filepath, 'w') as fp:
         json.dump(filedata, fp, indent=1)
-
+""
 
 # Reading json file, This returns an array contained in json file
 # EX: read_jsonfile('commands.json')
