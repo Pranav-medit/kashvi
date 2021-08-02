@@ -99,9 +99,9 @@ api_keys = {
 }
 
 # Retrieving main data required for program from files inside data folder.
-b_w = dt.retrieve_json_files(['bw.json'])[0][0]
 theme = dt.retrieve_json_files(['theme.json'])[0][0]
 commands = dt.retrieve_json_files(['commands.json'])[0][0]
+kan_joke = dt.retrieve_json_files(['kan_joke.json'])[0][0]
 error_codes = dt.retrieve_json_files(['errorcodes.json'])[0][0]
 
 
@@ -360,7 +360,7 @@ def newsretriever(number=10, api_key=api_keys['news_api'], country='in', categor
     counter = 0
     # Number of news
     news_list = []
-    url = f'https://newsapi.org/v2/top-headlines?country={country}&language=en&apiKey={api_key}'
+    url = f'https://newsapi.org/v2/top-headlines?country={country}&category=business&language=en&apiKey={api_key}'
     x = requests.get(url, timeout=5)
     # parse and get json from response
     x = json.loads(x.text)
@@ -377,6 +377,7 @@ def newsretriever(number=10, api_key=api_keys['news_api'], country='in', categor
             # patters to eliminate unrequired info
             pattern = re.compile(r'.*\s-\s')
             result = re.search(pattern, cray['title']).group()
+            print(result)
             clean_result = remove_special_charecters(result)
             news_list.append(clean_result)
         return news_list
@@ -406,7 +407,6 @@ def bwc(cmd):
     for bw in b_w:
         # if bw in cmd:
         if bw in cmd:
-            # ಇದುನ್ನಾ ನಿನ್ನ ಅಪ್ಪಂಗೆ ಹೇಳು
             return bw
     return ""
 
@@ -660,23 +660,33 @@ def google_search(user_input="who is Prime Minister of India"):
         # Scrape html to find particular div which contains data using Beautiful soup
         # find_all finds all 'div' but [2] selects only third 'div'
         match = html_parsed.find_all("div", {"class": "BNeawe s3v9rd AP7Wnd"})[2]
+        # print(match.text)
         # speak result
         return match.text
     else:
         # If user wants to know query a person
         # Translate kannada query to english
-        user_input = text_translator(user_input, dest='en')
+        user_input = text_translator(user_input, 'en')
+        # print(user_input)
         # Request html data from this url
         result = requests.get(f"https://www.google.com/search?q={user_input}")
+
         html_text = result.text
         # Parse html data
         html_parsed = BeautifulSoup(html_text, 'html.parser')
         # Scrape html to find particular div which contains data using Beautiful soup
         # find method searches for first possible match of the div
         # Note here class is not used and class_ is used because class is a python keyword and hence can't use
-        match = html_parsed.find('div', class_='BNeawe')
+        divIndex = 0
+        for index, divWithCont in enumerate(html_parsed.find_all('div', attrs={'class': 'kCrYT'})):
+            div = divWithCont.find('div', attrs={'class': 'BNeawe'})
+            if div is not None: divIndex = divIndex + 1
+            if divIndex == 1 and div is not None:
+                match=div.text
+
+                break
         # print(match.text.split(".", 1))
-        return match.text
+        return match
 
 
 # Get youtube link ,note that you want api key for youtube.
@@ -770,7 +780,7 @@ def main(commands=commands):
         # If user asks for news
         elif is_valid('news',user_input):
             # etks("How many news do you want to hear")
-            print('How')
+            #print('How')
             # take user input('en', "Tell me how many news do you want to hear....")
             for news in newsretriever(2):
                 etks(news)
@@ -835,7 +845,7 @@ def main(commands=commands):
             display(text_translator("Information is being fetched please wait", 'kn'), 3)
             result = google_search(google_query)
             print(result)
-            clean_result = remove_special_charecters(result)
+            clean_result = result.replace('-','')
             print(clean_result)
             if result:
                 etks(clean_result)
@@ -849,6 +859,8 @@ def main(commands=commands):
             map_query = user_input.replace(return_searched_word(commands['map'], user_input), '')
             # map_query = text_translator(map_query,'en')
             open_google_maps(f"https://www.google.com/maps/place/{map_query}")
+        elif is_valid('map',user_input):
+            etks(random.choice(kan_joke))
         else:
             pass
             # etks("Sorry I am not able to hear because of combined voice")
@@ -1255,7 +1267,7 @@ if __name__ == '__main__':
     helpmenu.add_command(label="Help to operate app", command=on_help)
     helpmenu.add_command(label="About us", command=lambda: print("K"))
     menubar.add_cascade(label="Help", menu=helpmenu)
-    # Theme options menu design and call change theme fuction if any option is pressed
+    # Theme options menu design and call change theme function if any option is pressed
     # Call change theme function to set current theme for first time
     # We are using destructured variable as arguments
     set_theme(cur_theme,theme_id)

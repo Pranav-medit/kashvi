@@ -1,6 +1,8 @@
 import json
 import os
-import main
+# import main
+
+
 theme = {
     'black_theme': {
         'app-bg': '#404040',
@@ -93,7 +95,7 @@ commands = {
     'e-mail':['ಇ-ಮೇಲ್ ಕಳಿಸು','ಇ-ಮೇಲ್','ಇಮೇಲ್ ಕಳುಹಿಸು'],
     'positive-statements': ['ಹೌದು', 'ಹಾ', 'ಎಸ್', 'ಓಕೆ'],
     'negative-statements': ['ನೋ', 'ಇಲ್ಲ', 'ಅಲ್ಲ'],
-    'meaning':['ಶಬ್ದದ ಅರ್ಥ','ಶಬ್ದ ಅರ್ಥ','ಶಬ್ದಾರ್ಥ','ಮೀನಿಂಗ್'],
+    'meaning':['ಶಬ್ದದ ಅರ್ಥ','ಶಬ್ದ ಅರ್ಥ','ಶಬ್ದಾರ್ಥ','ಮೀನಿಂಗ್','ಬಗ್ಗೆ','ಬಗ್ಗೆ ತಿಳಿಸು','ತಿಳಿಸು'],
 }
 
 
@@ -204,11 +206,18 @@ def print_json(json_list,func=print):
 
 
 if __name__ == '__main__':
-    # write_jsonfile('commands.json',commands)
+    # update_json_files(['kan_joke.json'],[jokes_arr])
+    write_jsonfile('commands.json',commands)
     # update_json_files(['filenames1','filenames2'], ['filedatas1','filenamesdata2'])
-    # update_json_files('bw.json',b_w)
-    # print_json(read_jsonfile('bw.json'))
-    print_json(retrieve_json_files(['commands.json'])[1])
+    # for _ in range(4):
+    #     import pyjokes
+    #     str = pyjokes.get_joke()
+    #     print(main.text_translator(str))
+    #     print(str)
+    #     from joke import generate
+
+        # generate()
+    # print_json(retrieve_json_files(['commands.json'])[1])
     pass
 
 # Update json files
@@ -216,3 +225,4 @@ if __name__ == '__main__':
 #     for j_index,j_item in enumerate(filedatas):
 #         if i_index == j_index:
 #             write_jsonfile(i_item,j_item)
+
