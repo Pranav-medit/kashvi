@@ -99,6 +99,7 @@ api_keys = {
 }
 
 # Retrieving main data required for program from files inside data folder.
+b_w = dt.retrieve_json_files(['bw.json'])[0][0]
 theme = dt.retrieve_json_files(['theme.json'])[0][0]
 commands = dt.retrieve_json_files(['commands.json'])[0][0]
 kan_joke = dt.retrieve_json_files(['kan_joke.json'])[0][0]
@@ -801,7 +802,7 @@ def main(commands=commands):
         # If user asks to open google in browser
         elif is_valid('google',user_input):
             open_website("https://www.google.com")
-        # If user asks to open google in browser
+        # If user asks to open google in brois wser
         elif is_valid('twitter',user_input):
             open_website("https://twitter.com")
         # If user asks to open google in browser
@@ -1149,7 +1150,9 @@ if __name__ == '__main__':
     # Check if returned result is not empty, if it is not empty then destructure result
     if res:[cur_theme, theme_id]=res
     # If resposne is empty (usually when an error occurs or if file is not present) return default theme (hard coded)
-    else:[cur_theme, theme_id]=[theme['black_theme'], 2]
+    else:[cur_theme, theme_id]=[theme['black_theme'], 2]\
+
+    print(res)
     # global variables
     # t1 is thread one which is used to start or stop a thread
     t1 = None
